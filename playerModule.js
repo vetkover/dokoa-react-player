@@ -38,7 +38,7 @@ const PlayerModule = () => {
             playerInterfaces[i].style.opacity = "1"
         }
  
-        if (dokoaPlayer.current.paused === true && dokoaPlayer.current.played != null) {
+        if (dokoaPlayer.current.paused == true || !isPlayed) {
             for (var i = 0; i < playerInterfaces.length; i++) {
                 playerInterfaces[i].style.opacity = "1"
             }
@@ -83,20 +83,17 @@ const PlayerModule = () => {
         mouseLine.current.style.width = 0 + "%";
     }
 
-    let timeLiner;
-
     let timeLineSet = (e) => {
         let mousePos = e.clientX
         let timeLineStart = timeLine.current.getBoundingClientRect().left
         let timeLineEnd = timeLine.current.getBoundingClientRect().right
         let percent = (100 / ((timeLineEnd - timeLineStart) / (mousePos - timeLineStart)));
         dokoaPlayer.current.currentTime = (dokoaPlayer.current.duration / 100) * percent;
-        timeLiner = (dokoaPlayer.current.duration / 100) * percent;
     }
 
     let timeLineCurrent = () => {
         timeLineBuffer()
-        let currentTime = dokoaPlayer.current.currentTime || timeLiner;
+        let currentTime = dokoaPlayer.current.currentTime;
         let duration = dokoaPlayer.current.duration;
         let percent = (100 / (duration / currentTime) )
         currentLine.current.style.width = percent + "%";
@@ -119,17 +116,18 @@ const PlayerModule = () => {
     let dokoaParent = createRef()
     let volumeInput = createRef()
 
-    let isPlayed = false;
+    let isPlayed;
 
     let Play = () => {
         if (dokoaPlayer.current.currentTime > 0 && !dokoaPlayer.current.paused && !dokoaPlayer.current.ended && dokoaPlayer.current.readyState > 2 || isPlayed) { 
-            dokoaPlayer.current.pause()
-            document.getElementById('playBtn').setAttribute("d", svg.play);
             isPlayed = false;
-
+            dokoaPlayer.current.pause()
+            interfaceVisible()
+            document.getElementById('playBtn').setAttribute("d", svg.play);
         } else {
-            dokoaPlayer.current.play()
             isPlayed = true;
+            dokoaPlayer.current.play()
+            interfaceVisible()
             document.getElementById('playBtn').setAttribute("d", svg.pause );
         }
     }
@@ -147,19 +145,54 @@ const PlayerModule = () => {
         }
     }
 
+    let playRewind = () => {
+            if (document.getElementsByClassName("playerInterface")[0].style.opacity == "0") {
+                interfaceVisible()
+            } else {
+                interfaceVisible()
+                Play()
+            }
+    }
+
+    let leftRewind = (e) => {
+        
+        setTimeout(() => {
+            if (e.detail == 1) {
+                playRewind()
+            }
+        }, 300)
+        if (e.detail > 1) {
+            if (!isPlayed) { Play() }
+                dokoaPlayer.current.currentTime -= 5;
+            }
+    }
+
+    let rightRewind = (e) => {
+
+        setTimeout(() => {
+            if (e.detail == 1) {
+                playRewind()
+            }
+        }, 300)
+        if (e.detail > 1) {
+            if (!isPlayed) { Play() }
+            dokoaPlayer.current.currentTime += 5;
+        }
+    }
+
     let fullScreen = () => {
         if (document.fullscreenElement) {
-            closeFullscreen() 
+            closeFullscreen()
         } else {
-            openFullscreen()  
+            openFullscreen()
         }
 
         function openFullscreen() {
             if (dokoaParent.current.requestFullscreen) {
                 dokoaParent.current.requestFullscreen();
-            } else if (dokoaParent.current.webkitRequestFullscreen) { 
+            } else if (dokoaParent.current.webkitRequestFullscreen) {
                 dokoaParent.current.webkitRequestFullscreen();
-            } else if (dokoaParent.current.msRequestFullscreen) { 
+            } else if (dokoaParent.current.msRequestFullscreen) {
                 dokoaParent.current.msRequestFullscreen();
             }
         }
@@ -169,7 +202,7 @@ const PlayerModule = () => {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { 
+            } else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
             }
         }
@@ -177,14 +210,19 @@ const PlayerModule = () => {
         // non-react event
 
         document.addEventListener('fullscreenchange', fullscreenSVG);
-    } 
+    
+} 
 
     return (
         <div >
-            <div className="dokoaPlayer" ref={dokoaParent} onMouseMove={interfaceVisible} onKeyDown={keyReg} >
+            <div className="dokoaPlayer" ref={dokoaParent} onMouseMove={interfaceVisible} onKeyDown={keyReg}>
                 <div className="blackBack"></div>
+                
                 <video ref={dokoaPlayer} src={link} preload="auto" onTimeUpdate={timeLineCurrent} onEnded={repeatSVG} ></video>
-
+                <div className="rewindControls" >
+                    <button className="leftRewind rewind" onClick={leftRewind}></button>
+                    <button className="rightRewind rewind" onClick={rightRewind}></button>
+                </div>
                 <div className="timeLineContainer">
                     <button className="timeLine playerInterface" id="timeLine" ref={timeLine} onClick={timeLineSet} onMouseLeave={timeLineClear} onMouseMove={timeLineCalc} onTouchMove={timeLineCalc} onTouchEnd={timeLineSet}>
                         <div className="line"></div>
