@@ -19,7 +19,6 @@ const PlayerModule = () => {
         e.preventDefault()
         try {
             if (e.code == "Space") {
-                
                 Play();
                 interfaceVisible()
             } if (e.code == "ArrowRight") {
@@ -50,7 +49,7 @@ const PlayerModule = () => {
             }, 3000);
 
             if (timer) {
-                for (var i = 0; i < timer; i += 1) {
+                for (var i = 0; i < timer; i++) {
                     clearTimeout(i);
                 }
             }
@@ -95,8 +94,8 @@ const PlayerModule = () => {
         timeLineBuffer()
         let currentTime = dokoaPlayer.current.currentTime;
         let duration = dokoaPlayer.current.duration;
-        let percent = (100 / (duration / currentTime) )
-        currentLine.current.style.width = percent + "%";
+        let percent = (100 / (duration / currentTime)) + "%"
+        currentLine.current.style.width = percent;
     }
 
     let timeLineBuffer = () => {
@@ -108,6 +107,43 @@ const PlayerModule = () => {
                 }
             }
         },200)
+    }
+
+    //invisible controls interface
+
+    let isPhone = (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) ? true : false;
+
+    let playRewind = () => {
+        if (document.getElementsByClassName("playerInterface")[0].style.opacity == 0) {
+            interfaceVisible()
+        } else {
+            interfaceVisible()
+            Play()
+        }
+    }
+
+    let leftRewind = (e) => {
+        setTimeout(() => {
+            if (e.detail == 1) {
+                playRewind()
+            }
+        }, 150)
+        if (e.detail > 1 && isPhone) {
+            if (!isPlayed) { Play() }
+            dokoaPlayer.current.currentTime -= 5;
+        }
+    }
+
+    let rightRewind = (e) => {
+        setTimeout(() => {
+            if (e.detail == 1) {
+                playRewind()
+            }
+        }, 150)
+        if (e.detail > 1 && isPhone) {
+            if (!isPlayed) { Play() }
+            dokoaPlayer.current.currentTime += 5;
+        }
     }
 
     //controlPanel
@@ -137,48 +173,10 @@ const PlayerModule = () => {
         interfaceVisible() // android chromium fix bug with reading movements in parent class via input range
     }
 
-    function fullscreenSVG() {
-        if (document.fullscreenElement) {
-            document.getElementById('fullscreenBtn').setAttribute("d", svg.extend);
-        } else {
-            document.getElementById('fullscreenBtn').setAttribute("d", svg.fullscreen);
-        }
+    let defaultVolume = () => {
+        dokoaPlayer.current.volume = 0.5;
     }
 
-    let playRewind = () => {
-            if (document.getElementsByClassName("playerInterface")[0].style.opacity == "0") {
-                interfaceVisible()
-            } else {
-                interfaceVisible()
-                Play()
-            }
-    }
-
-    let leftRewind = (e) => {
-        
-        setTimeout(() => {
-            if (e.detail == 1) {
-                playRewind()
-            }
-        }, 300)
-        if (e.detail > 1) {
-            if (!isPlayed) { Play() }
-                dokoaPlayer.current.currentTime -= 5;
-            }
-    }
-
-    let rightRewind = (e) => {
-
-        setTimeout(() => {
-            if (e.detail == 1) {
-                playRewind()
-            }
-        }, 300)
-        if (e.detail > 1) {
-            if (!isPlayed) { Play() }
-            dokoaPlayer.current.currentTime += 5;
-        }
-    }
 
     let fullScreen = () => {
         if (document.fullscreenElement) {
@@ -207,10 +205,21 @@ const PlayerModule = () => {
             }
         }
 
+       
+        // technical functions
+
+
+        function fullscreenSVG() {
+            if (document.fullscreenElement) {
+                document.getElementById('fullscreenBtn').setAttribute("d", svg.extend);
+            } else {
+                document.getElementById('fullscreenBtn').setAttribute("d", svg.fullscreen);
+            }
+        }
+
         // non-react event
 
         document.addEventListener('fullscreenchange', fullscreenSVG);
-    
 } 
 
     return (
@@ -218,7 +227,7 @@ const PlayerModule = () => {
             <div className="dokoaPlayer" ref={dokoaParent} onMouseMove={interfaceVisible} onKeyDown={keyReg}>
                 <div className="blackBack"></div>
                 
-                <video ref={dokoaPlayer} src={link} preload="auto" onTimeUpdate={timeLineCurrent} onEnded={repeatSVG} ></video>
+                <video ref={dokoaPlayer} src={link} preload="auto" onTimeUpdate={timeLineCurrent} onEnded={repeatSVG} onLoadStart={defaultVolume} ></video>
                 <div className="rewindControls" >
                     <button className="leftRewind rewind" onClick={leftRewind}></button>
                     <button className="rightRewind rewind" onClick={rightRewind}></button>
