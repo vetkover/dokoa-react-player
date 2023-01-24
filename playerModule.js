@@ -1,8 +1,7 @@
-import React, { createRef } from 'react'
-import "player.scss"
+import React, { createRef, useState } from 'react'
+import "./../Player/player.scss"
 
-const link = "https://drive.google.com/u/0/uc?id=1_1qah9bAps87rurOFnKgOxui-NnneQ_O&export=download&confirm=t&uuid=26b1c2c4-091d-459d-9574-3f92c19ab924&at=AHV7M3cBHszCNxm9sM8lNgYjwHaR:1668074390852"
-
+const link = "./video.mp4"
 const svg = {
     pause: "M42,2.98v43.54c0,0.54-0.71,0.98-1.59,0.98h-7.08c-0.88,0-1.59-0.44-1.59-0.98V2.98 c0-0.54,0.71-0.98,1.59-0.98h7.08C41.29,2,42,2.44,42,2.98z M18.62,2.98v43.54c0,0.54-0.71,0.98-1.59,0.98H9.96c-0.88,0-1.59-0.44-1.59-0.98V2.98C8.37,2.44,9.08,2,9.96,2 h7.08C17.91,2,18.62,2.44,18.62,2.98z",
     play: "M8.5,2.99v43.88c0,0.66,0.74,1.05,1.29,0.68l31.73-21.87c0.47-0.33,0.47-1.03,0-1.35L9.79,2.31 C9.25, 1.93, 8.5, 2.32, 8.5, 2.99z",
@@ -13,36 +12,61 @@ const svg = {
 
 const PlayerModule = () => {
 
+    //event route
+
+    const onTimeUpdate = () => {
+        timeLineBuffer()
+        timeLineCurrent()
+        videoTimeCurrent()
+    }
+
+    let onLoadStart = () => {
+        dokoaPlayer.current.volume = 0.5; //default volume
+    }
+
+    let onLoadedMetadata = () => {
+        videoTimeDuration()
+
+    }
     //interface
 
     let keyReg = (e) => {
         e.preventDefault()
         try {
-            if (e.code == "Space") {
-                Play();
-                interfaceVisible()
-            } if (e.code == "ArrowRight") {
-                dokoaPlayer.current.currentTime += 5;
-            } if (e.code == "ArrowLeft") {
-                dokoaPlayer.current.currentTime -= 5;
-            } if (e.code == "ArrowUp") {
-                dokoaPlayer.current.volume += 0.1;
+            switch (e.code) {
+                case "Space":
+                    Play();
+                    interfaceVisible()
+                    break;
+                case "ArrowRight":
+                    dokoaPlayer.current.currentTime += 5;
+                    break;
+                case "ArrowLeft":
+                    dokoaPlayer.current.currentTime -= 5;
+                    break;
+                case "ArrowUp":
+                    arrowVolumeUp()
+                    break;
+                case "ArrowDown":
+                    arrowVolumeDown()
+                    break;
             }
-        } catch { }
-    };
+        } catch { // it's easier than re-checking each function :3 
+        }
+    }
 
     let interfaceVisible = () => {
         let playerInterfaces = document.getElementsByClassName("playerInterface")
         for (var i = 0; i < playerInterfaces.length; i++) {
             playerInterfaces[i].style.opacity = "1"
         }
- 
+
         if (dokoaPlayer.current.paused == true || !isPlayed) {
             for (var i = 0; i < playerInterfaces.length; i++) {
                 playerInterfaces[i].style.opacity = "1"
             }
         } else {
-            let timer = setTimeout(function()  { 
+            let timer = setTimeout(function () {
                 for (var i = 0; i < playerInterfaces.length; i++) {
                     playerInterfaces[i].style.opacity = "0"
                 }
@@ -91,22 +115,21 @@ const PlayerModule = () => {
     }
 
     let timeLineCurrent = () => {
-        timeLineBuffer()
+        
         let currentTime = dokoaPlayer.current.currentTime;
         let duration = dokoaPlayer.current.duration;
-        let percent = (100 / (duration / currentTime)) + "%"
-        currentLine.current.style.width = percent;
+        let percent = (100 / (duration / currentTime))
+        currentLine.current.style.width = percent + "%";
     }
 
     let timeLineBuffer = () => {
         let current = dokoaPlayer.current.currentTime
-        setTimeout(() => {
+        
             for (var buffer_length_now = 0; buffer_length_now < dokoaPlayer.current.buffered.length; buffer_length_now++) {
                 if (current >= dokoaPlayer.current.buffered.start(buffer_length_now) && current <= dokoaPlayer.current.buffered.end(buffer_length_now)) {
                     bufferLine.current.style.width = (100 / (dokoaPlayer.current.duration / dokoaPlayer.current.buffered.end(buffer_length_now))) + "%";
                 }
             }
-        },200)
     }
 
     //invisible controls interface
@@ -146,6 +169,18 @@ const PlayerModule = () => {
         }
     }
 
+    function arrowVolumeUp() {
+        if (dokoaPlayer.current.volume > 0.95) { dokoaPlayer.current.volume = 0.95 }
+        dokoaPlayer.current.volume += 0.05;
+        volumeInput.current.value = dokoaPlayer.current.volume * 100;
+    }
+
+    function arrowVolumeDown() {
+        if (dokoaPlayer.current.volume < 0.05) { dokoaPlayer.current.volume = 0.05 }
+        dokoaPlayer.current.volume -= 0.05;
+        volumeInput.current.value = dokoaPlayer.current.volume * 100;
+    }
+
     //controlPanel
 
     let dokoaPlayer = createRef()
@@ -155,7 +190,7 @@ const PlayerModule = () => {
     let isPlayed;
 
     let Play = () => {
-        if (dokoaPlayer.current.currentTime > 0 && !dokoaPlayer.current.paused && !dokoaPlayer.current.ended && dokoaPlayer.current.readyState > 2 || isPlayed) { 
+        if (dokoaPlayer.current.currentTime > 0 && !dokoaPlayer.current.paused && !dokoaPlayer.current.ended && dokoaPlayer.current.readyState > 2 || isPlayed) {
             isPlayed = false;
             dokoaPlayer.current.pause()
             interfaceVisible()
@@ -164,7 +199,7 @@ const PlayerModule = () => {
             isPlayed = true;
             dokoaPlayer.current.play()
             interfaceVisible()
-            document.getElementById('playBtn').setAttribute("d", svg.pause );
+            document.getElementById('playBtn').setAttribute("d", svg.pause);
         }
     }
 
@@ -173,10 +208,40 @@ const PlayerModule = () => {
         interfaceVisible() // android chromium fix bug with reading movements in parent class via input range
     }
 
-    let defaultVolume = () => {
-        dokoaPlayer.current.volume = 0.5;
+    // duration and current video render
+    let [timeData, setTimeData] = useState({
+        current: '00:00',
+        duration: '00:00',
+    })
+
+    let videoTimeDuration = () => {
+        let time = dokoaPlayer.current.duration
+        let timeInMinutes = Math.floor(time / 60);
+        let timeInSeconds = Math.floor(time % 60);
+        if (timeInMinutes < 10) { timeInMinutes = "0" + timeInMinutes }
+        if (timeInSeconds < 10) { timeInSeconds = "0" + timeInSeconds }
+        let duration = timeInMinutes + ':' + timeInSeconds;
+        setTimeData({
+            ...timeData, duration: duration,
+        })
     }
 
+    let videoTimeCurrent = () => {
+        let time = dokoaPlayer.current.currentTime
+        let timeInMinutes = Math.floor(time / 60);
+        let timeInSeconds = Math.floor(time % 60);
+        if (timeInMinutes < 10) { timeInMinutes = "0" + timeInMinutes }
+        if (timeInSeconds < 10) { timeInSeconds = "0" + timeInSeconds }
+        let current = timeInMinutes + ':' + timeInSeconds;
+        setTimeData({
+            ...timeData, current: current,
+        })
+    }
+
+    let currentVideoTime = createRef();
+    let durationVideoTime = createRef();
+
+    // settings
 
     let fullScreen = () => {
         if (document.fullscreenElement) {
@@ -204,7 +269,6 @@ const PlayerModule = () => {
                 document.msExitFullscreen();
             }
         }
-
        
         // technical functions
 
@@ -227,11 +291,21 @@ const PlayerModule = () => {
             <div className="dokoaPlayer" ref={dokoaParent} onMouseMove={interfaceVisible} onKeyDown={keyReg}>
                 <div className="blackBack"></div>
                 
-                <video ref={dokoaPlayer} src={link} preload="auto" onTimeUpdate={timeLineCurrent} onEnded={repeatSVG} onLoadStart={defaultVolume} ></video>
+                <video ref={dokoaPlayer} src={link} preload="auto" onTimeUpdate={onTimeUpdate} onEnded={repeatSVG} onLoadStart={onLoadStart} onLoadedMetadata={onLoadedMetadata} ></video>
                 <div className="rewindControls" >
                     <button className="leftRewind rewind" onClick={leftRewind}></button>
                     <button className="rightRewind rewind" onClick={rightRewind}></button>
                 </div>
+
+                <button className="settingsParent" ref={settingsParent} onClick={settingsButtonClick}>
+                <div className="settingsContainer">
+                        <div className="settingsOption"></div>
+                        <div className="settingsOption"></div>
+                        <div className="settingsOption"></div>
+                        <div className="settingsOption"></div>
+                        <div className="settingsOption"></div>
+                </div>
+                </button>
                 <div className="timeLineContainer">
                     <button className="timeLine playerInterface" id="timeLine" ref={timeLine} onClick={timeLineSet} onMouseLeave={timeLineClear} onMouseMove={timeLineCalc} onTouchMove={timeLineCalc} onTouchEnd={timeLineSet}>
                         <div className="line"></div>
@@ -253,9 +327,16 @@ const PlayerModule = () => {
                 <div className="volumeContainer">
                             <input ref={volumeInput} onChange={volume} className="volumeInput" type="range" min="0" max="100"  ></input>
                         </div>
+
+                        <div className="currentTimeContainer">
+                            <div className="currentTime" ref={currentVideoTime}> {timeData.current} </div>
+                            <div className="currentTime" >/</div>
+                            <div className="currentTime" ref={durationVideoTime}> {timeData.duration} </div>
+                        </div>
+
                     </div>
                 <div className="rightControl">
-                    <div className="settingsContainer">
+                    <div className="settingsButtonContainer">
                             <button className="settings">
                                 <svg viewBox="0 0 200 200">
                                     <path id="settingsBtn" d={svg.settings} />

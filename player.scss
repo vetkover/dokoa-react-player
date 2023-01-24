@@ -32,13 +32,41 @@
 }
 
 .dokoaPlayer {
-    width: 537px;
-    height: 302px;
+    resize: both;
+    overflow-x: auto;
+    width: 669px;
+    height: 376px;
     position: relative;
     margin-left: calc(50% - 270px);
     margin-right: auto;
     left: 0;
     right: 0;
+
+    .settingsParent {
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        height: calc(100% - 44px);
+        background: #ff0000;
+
+        .settingsContainer {
+            z-index: 6;
+            overflow-y: scroll;
+            width: 247px;
+            height: 216px;
+            background: #202124cf;
+            position: absolute;
+            right: 5px;
+            bottom: 45px;
+
+            .settingsOption {
+                margin: 50px;
+                width: 50px;
+                height: 50px;
+                background: #ffffff;
+            }
+        }
+    }
 
     video::-webkit-media-controls {
         display: none !important;
@@ -60,13 +88,14 @@
 
     .timeLineContainer {
         margin: 5px 5px 5px 5px;
-    }
 
 
-    @media all and (display-mode: fullscreen) {
-        .timeLine {
-            max-width: 100%;
-            min-width: 98.9%;
+
+        @media (min-width: 500px) {
+            .timeLine {
+                max-width: 100%;
+                min-width: 98.9%;
+            }
         }
     }
 
@@ -157,6 +186,25 @@
             display: flex;
             align-items: center;
 
+            .currentTimeContainer {
+                display: flex;
+
+                &:before {
+                    content: " ";
+                    margin-left: 16px;
+                }
+
+                .currentTime {
+                    color: white;
+                    font-size: 13px;
+
+                    &:after {
+                        content: " ";
+                        margin-right: 5px
+                    }
+                }
+            }
+
             .Play-btn {
                 background-color: transparent;
 
@@ -196,14 +244,11 @@
             margin-right: 5px;
             align-items: center;
 
-
-
-            .settingsContainer {
+            .settingsButtonContainer {
                 width: 10%;
                 display: flex;
                 float: right;
                 margin-right: 5px;
-
 
                 .settings {
                     background: transparent;
@@ -213,7 +258,6 @@
                     }
                 }
             }
-
 
             .fullScreenContainer {
                 margin-left: auto;
