@@ -1,7 +1,7 @@
 import React, { createRef, useState } from 'react'
 import "./../Player/player.scss"
 
-const link = "./video.mp4"
+const link = "https://rr3---sn-5hnekn7s.googlevideo.com/videoplayback?expire=1675129590&ei=lh7YY5zfH6CZv_IPwqCvyAQ&ip=154.92.120.73&id=o-AK6UG8K4etuNGsEzFf4byV9_FVNeZ4Zzh-PSZIR5NkfS&itag=22&source=youtube&requiressl=yes&mh=ld&mm=31%2C29&mn=sn-5hnekn7s%2Csn-5hne6n6l&ms=au%2Crdu&mv=u&mvi=3&pl=24&spc=H3gIho9QhapFVdZONGIckQcPImHSpLQ&vprv=1&mime=video%2Fmp4&ns=W0I9OJZVdcdqQ8K9YPSJWzEL&cnr=14&ratebypass=yes&dur=1476.185&lmt=1675054796367708&mt=1675106162&fvip=5&fexp=24007246&c=WEB&txp=4432434&n=SjSP8pGhFEyWoQ&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cspc%2Cvprv%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AOq0QJ8wRQIgfqww1v2o_GnGfMRIgTCR-LUYdAIYDxD5wxzSZhe0Ig4CIQDq4ZTLUnFUmFJfQfitfHjMqE8sXySWXUkD0_pHE9ermA%3D%3D&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl&lsig=AG3C_xAwRQIhAPLRdELg62Tgh8fuaHCm4xbMrnwJd0MLBKOuGJu4ZJjOAiBz89k6AIOHiPA2gAv7y-hMMymoLP1Kk5wsQol7niMXrw%3D%3D&title=%D0%91%D0%A0%D0%90%D0%A2%D0%98%D0%A8%D0%9A%D0%98%D0%9D%20%D0%A1%D0%9C%D0%9E%D0%A2%D0%A0%D0%98%D0%A2%20%D0%92%D0%95%D0%91%D0%9C%D0%AB%20%D0%A2%D0%98%D0%9A%20%D0%A2%D0%9E%D0%9A%20(48%20%D1%87%D0%B0%D1%81%D1%82%D1%8C)"
 const svg = {
     pause: "M42,2.98v43.54c0,0.54-0.71,0.98-1.59,0.98h-7.08c-0.88,0-1.59-0.44-1.59-0.98V2.98 c0-0.54,0.71-0.98,1.59-0.98h7.08C41.29,2,42,2.44,42,2.98z M18.62,2.98v43.54c0,0.54-0.71,0.98-1.59,0.98H9.96c-0.88,0-1.59-0.44-1.59-0.98V2.98C8.37,2.44,9.08,2,9.96,2 h7.08C17.91,2,18.62,2.44,18.62,2.98z",
     play: "M8.5,2.99v43.88c0,0.66,0.74,1.05,1.29,0.68l31.73-21.87c0.47-0.33,0.47-1.03,0-1.35L9.79,2.31 C9.25, 1.93, 8.5, 2.32, 8.5, 2.99z",
@@ -243,6 +243,37 @@ const PlayerModule = () => {
 
     // settings
 
+    const settingsParent = createRef();
+    const settingsMainWndow = createRef();
+    const settingsSpeedWindow = createRef();
+    const backToMainWindow = createRef();
+
+    const settingsButtonClick = () => {
+        if (settingsParent.current.classList.contains('settingsActive')) {
+            console.log('unactive')
+            settingsParent.current.classList.remove('settingsActive');
+            settingsParent.current.style.display = "none";
+        } else {
+            console.log('active')
+            settingsParent.current.classList.add('settingsActive');
+            settingsParent.current.style.display = "contents";
+        }
+    }
+
+    const backToMainWindowButton = () => {
+        settingsMainWndow.current.style.display = "contents";
+        settingsSpeedWindow.current.style.display = "none";
+        backToMainWindow.current.style.display = "none";
+    }
+
+    function settingsOptionChange(option) {
+        settingsMainWndow.current.style.display = "none";
+        settingsSpeedWindow.current.style.display = "contents";
+        backToMainWindow.current.style.display = "flex";
+        console.log(option)
+
+    }
+
     let fullScreen = () => {
         if (document.fullscreenElement) {
             closeFullscreen()
@@ -297,15 +328,58 @@ const PlayerModule = () => {
                     <button className="rightRewind rewind" onClick={rightRewind}></button>
                 </div>
 
-                <button className="settingsParent" ref={settingsParent} onClick={settingsButtonClick}>
-                <div className="settingsContainer">
-                        <div className="settingsOption"></div>
-                        <div className="settingsOption"></div>
-                        <div className="settingsOption"></div>
-                        <div className="settingsOption"></div>
-                        <div className="settingsOption"></div>
+                <div className="settingsParent" ref={settingsParent}>
+                    <div className="settingsOutlineChecker" onClick={settingsButtonClick}></div>
+                    <div className="settingsContainer">
+
+                        <div className="backToMainWindow" ref={backToMainWindow}>
+                            <button onClick={backToMainWindowButton}>
+                                <svg viewBox="0 0 600 600" width="25px" height="30px" fill="transparent">
+                                    <g>
+                                        <path fill="white" d="M 573.73418,237.53137 A 42.015938,42.066681 0 0 0 560.01946,208.40774 L 328.86196,-1.8622997 a 42.015938,42.066681 0 0 0 -0.0513,-0.034908 42.015938,42.066681 0 0 0 -28.2031,-11.5463712 42.015938,42.066681 0 0 0 -28.199,11.5443177 42.015938,42.066681 0 0 0 -0.0554,0.036962 L 41.195655,208.40774 a 42.015938,42.066681 0 0 0 -2.844323,59.42387 42.015938,42.066681 0 0 0 59.351082,2.84809 L 258.59123,124.32847 v 452.27155 a 42.015938,42.066681 0 0 0 42.01633,42.06633 42.015938,42.066681 0 0 0 42.01632,-42.06633 V 124.32847 L 503.51065,270.6797 a 42.015938,42.066681 0 0 0 59.35313,-2.84809 42.015938,42.066681 0 0 0 10.8704,-30.30024 z" />
+                                    </g>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="settingsMainWndow" ref={settingsMainWndow}>
+                            <button className="settingsOption" onClick={function () { settingsOptionChange("speed") }}>
+                                <div className="settignsIco">
+                                    <svg width="40px" height="40px" viewBox="0 0 24 24" fill="transparent" >
+                                        <path d="M6.34315 17.6569C5.22433 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00346 10.4003 4.60896 8.93853C5.21446 7.47672 6.23984 6.22729 7.55544 5.34824C8.87103 4.46919 10.4177 4 12 4C13.5823 4 15.129 4.46919 16.4446 5.34824C17.7602 6.22729 18.7855 7.47672 19.391 8.93853C19.9965 10.4003 20.155 12.0089 19.8463 13.5607C19.5376 15.1126 18.7757 16.538 17.6569 17.6569" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M12 12L16 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                            <div className="settingsOptionButton">speed</div>
+                            </button>
+
+                            <button className="settingsOption" onClick={function () { settingsOptionChange("caption") }}>
+                                <div className="settignsIco">
+                                    <svg fill="#000000" width="40px" height="38px" viewBox="0 0 32 32" fill="white">
+                                        <path d="M15,21H10a2,2,0,0,1-2-2V13a2,2,0,0,1,2-2h5v2H10v6h5Z" ></path>
+                                        <path d="M25,21H20a2,2,0,0,1-2-2V13a2,2,0,0,1,2-2h5v2H20v6h5Z"></path>
+                                        <path d="M28,26H4a2,2,0,0,1-2-2V8A2,2,0,0,1,4,6H28a2,2,0,0,1,2,2V24A2,2,0,0,1,28,26ZM4,8V24H28V8Z"></path>
+                                    </svg>
+                                </div>
+                            <div className="settingsOptionButton">caption</div>
+                        </button>
+                        </div>
+
+                        <div className="settingsSpeedWindow" ref={settingsSpeedWindow}><button className="settingsOption" onClick={function () { settingsOptionChange("speed") }}>
+                                <div className="settignsIco">
+                                    <svg fill="#000000" width="40px" height="38px" viewBox="0 0 32 32" fill="white">
+                                        <path d="M15,21H10a2,2,0,0,1-2-2V13a2,2,0,0,1,2-2h5v2H10v6h5Z" ></path>
+                                        <path d="M25,21H20a2,2,0,0,1-2-2V13a2,2,0,0,1,2-2h5v2H20v6h5Z"></path>
+                                        <path d="M28,26H4a2,2,0,0,1-2-2V8A2,2,0,0,1,4,6H28a2,2,0,0,1,2,2V24A2,2,0,0,1,28,26ZM4,8V24H28V8Z"></path>
+                                    </svg>
+                                </div>
+                            <div className="settingsOptionButton">speed</div>
+                        </button></div>
+
+                        <div className="settingsCaptionWindow"></div>
+
+                    </div>
                 </div>
-                </button>
                 <div className="timeLineContainer">
                     <button className="timeLine playerInterface" id="timeLine" ref={timeLine} onClick={timeLineSet} onMouseLeave={timeLineClear} onMouseMove={timeLineCalc} onTouchMove={timeLineCalc} onTouchEnd={timeLineSet}>
                         <div className="line"></div>
@@ -335,9 +409,10 @@ const PlayerModule = () => {
                         </div>
 
                     </div>
+
                 <div className="rightControl">
                     <div className="settingsButtonContainer">
-                            <button className="settings">
+                            <button className="settings" onClick={settingsButtonClick}>
                                 <svg viewBox="0 0 200 200">
                                     <path id="settingsBtn" d={svg.settings} />
                                 </svg>
@@ -353,9 +428,6 @@ const PlayerModule = () => {
                 </div>
             </div>
             </div>
-            <div className="playlistContainer">
-                </div>
-
         </div>
     )
 }

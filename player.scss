@@ -43,27 +43,68 @@
     right: 0;
 
     .settingsParent {
-        position: absolute;
-        z-index: 2;
-        width: 100%;
-        height: calc(100% - 44px);
-        background: #ff0000;
+        display: none;
+
+        .settingsOutlineChecker {
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+            height: calc(100% - 44px);
+        }
 
         .settingsContainer {
             z-index: 6;
             overflow-y: scroll;
-            width: 247px;
-            height: 216px;
+            max-width: 247px;
+            max-height: 216px;
             background: #202124cf;
             position: absolute;
             right: 5px;
             bottom: 45px;
 
+            .backToMainWindow {
+                width: 100%;
+                display: none;
+                height: 40px;
+                border-bottom: 2px solid #373737;
+                justify-content: flex-start;
+                align-items: center;
+
+                button {
+                    margin-left: 17px;
+                    background: transparent;
+                }
+
+                svg {
+                    transform: rotate(270deg);
+                }
+            }
+
+            .settingsSpeedWindow {
+                display: none;
+            }
+
             .settingsOption {
-                margin: 50px;
-                width: 50px;
-                height: 50px;
-                background: #ffffff;
+                display: flex;
+                height: 52px;
+                width: 214px;
+                justify-content: flex-start;
+                align-items: center;
+                margin: 7px;
+                background: transparent;
+
+                .settignsIco {
+                    width: 50px;
+                    height: 50px;
+                    margin-right: 9px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .settingsOptionButton {
+                    color: white;
+                }
             }
         }
     }
@@ -88,8 +129,6 @@
 
     .timeLineContainer {
         margin: 5px 5px 5px 5px;
-
-
 
         @media (min-width: 500px) {
             .timeLine {
@@ -180,6 +219,9 @@
         position: absolute;
         width: 100%;
         bottom: 0%;
+        padding: 3px 0px 2px 0px;
+        background: rgb(0,0,0);
+        background: linear-gradient(0deg, rgba(0,0,0,0.5732668067226891) 0%, rgba(255,255,255,0) 100%);
 
         .leftControl {
             width: 50%;
