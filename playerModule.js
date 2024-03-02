@@ -1,17 +1,11 @@
-import React, { createRef, useState } from "react";
-import "./../Player/player.scss";
+import React, { createRef, useRef, useState } from "react";
+import "./player.scss";
 
-const link =
-    "https://drive.google.com/uc?export=download&id=1yEUV3hJaEz8ImpWH_PsG2cHARPfPRPxb";
 const links = [
-    {
-        quality: 1080,
-        url: "https://drive.google.com/uc?export=download&id=1HGs6nA2EqVURzMGQ6eFkW4jNWRZAjnjf",
-    },
-    {
-        quality: 480,
-        url: "https://drive.google.com/uc?export=download&id=1yEUV3hJaEz8ImpWH_PsG2cHARPfPRPxb",
-    },
+//    {
+//   quality: 1080,
+//       url: "https://",
+//   }
 ];
 const svg = {
     pause:
@@ -25,8 +19,11 @@ const svg = {
         "M148.29,93.77c0.32-2.65,0.53-5.41,0.53-8.27c0-2.68-0.19-5.17-0.47-7.73c-0.04-0.33,0.1-0.66,0.36-0.87l17.39-13.66c1.59-1.27,2.01-3.5,0.95-5.41L150.1,28.57c-0.95-1.8-3.29-2.54-5.09-1.8l-20.59,8.28c-0.32,0.13-0.67,0.08-0.94-0.13c-4.09-3.13-8.54-5.7-13.37-7.72c-0.31-0.13-0.54-0.42-0.58-0.75l-3.1-21.93C106.2,2.48,104.4,1,102.28,1H68.35c-2.12,0-3.82,1.48-4.13,3.5l-3.1,21.94c-0.05,0.33-0.27,0.61-0.58,0.75c-4.74,2.03-9.2,4.7-13.38,7.74c-0.27,0.2-0.62,0.24-0.93,0.12l-20.6-8.28c-1.91-0.74-4.13,0-5.09,1.8L3.57,57.83c-1.06,1.8-0.53,4.13,0.95,5.41L21.91,76.9c0.26,0.21,0.4,0.53,0.36,0.87c-0.28,2.5-0.47,5.16-0.47,7.74c0,2.58,0.19,5.16,0.47,7.74c0.04,0.33-0.1,0.66-0.36,0.87L4.53,107.76c-1.59,1.27-2.01,3.5-0.95,5.41l16.96,29.26c0.95,1.8,3.29,2.54,5.09,1.8l20.59-8.28c0.32-0.13,0.67-0.08,0.94,0.13c4.09,3.13,8.54,5.7,13.37,7.72c0.31,0.13,0.54,0.42,0.58,0.75l3.1,21.93c0.21,2.01,2.01,3.5,4.13,3.5h33.93c2.12,0,3.82-1.48,4.13-3.5l3.1-21.94c0.05-0.33,0.27-0.61,0.58-0.75c4.74-2.03,9.2-4.7,13.38-7.74c0.27-0.2,0.62-0.24,0.93-0.12l20.6,8.28c1.91,0.74,4.13,0,5.09-1.8l16.96-29.26c0.95-1.8,0.53-4.13-0.95-5.41L148.29,93.77C148.29,93.77,148.29,93.77,148.29,93.77z M85.32,115.08c-16.33,0-29.69-13.25-29.69-29.69c0-16.33,13.25-29.69,29.69-29.69c16.33,0,29.69,13.25,29.69,29.69C115,101.72,101.75,115.08,85.32,115.08L85.32,115.08z",
 };
 
-const PlayerModule = () => {
+const PlayerModule = ({link}) => {
     //event route
+
+    const playBtn = useRef()
+    const fullscreenBtn = useRef()
 
     const onTimeUpdate = () => {
         timeLineBuffer();
@@ -69,13 +66,15 @@ const PlayerModule = () => {
             // it's easier than re-checking each function :3
         }
     };
-    const settingsParent = createRef();
-    const settingsMainWndow = createRef();
-    const settingsSpeedWindow = createRef();
-    const backToMainWindow = createRef();
+    const settingsParent = useRef();
+    const settingsMainWndow = useRef();
+    const settingsSpeedWindow = useRef();
+    const settingsCaptionWindow = useRef();
+    const settingsQualityWindow = useRef()
+    
+    const backToMainWindow = useRef();
     let interfaceVisible = () => {
         let playerInterfaces = document.getElementsByClassName("playerInterface");
-        let settingsParent = document.getElementsByClassName("settingsParent");
         for (var i = 0; i < playerInterfaces.length; i++) {
             playerInterfaces[i].style.opacity = "1";
         }
@@ -89,8 +88,8 @@ const PlayerModule = () => {
             let timer = setTimeout(function () {
                 for (var i = 0; i < playerInterfaces.length; i++) {
                     playerInterfaces[i].style.opacity = "0";
-                    settingsParent[0].style.display = "none";
-                    settingsParent[0].classList.remove("settingsActive");
+                    settingsParent.current.style.display = "none";
+                    settingsParent.current.classList.remove("settingsActive");
                 }
             }, 3000);
 
@@ -103,7 +102,7 @@ const PlayerModule = () => {
     };
 
     function repeatSVG() {
-        document.getElementById("playBtn").setAttribute("d", svg.play);
+        playBtn.current.setAttribute("d", svg.play);
     }
 
     //timeLine
@@ -247,7 +246,7 @@ const PlayerModule = () => {
             ) {
                 window.isPlayed = true;
                 dokoaPlayer.current.play();
-                document.getElementById("playBtn").setAttribute("d", svg.pause);
+                playBtn.current.setAttribute("d", svg.pause);
             }
         } else {
             if (
@@ -260,12 +259,12 @@ const PlayerModule = () => {
                 window.isPlayed = false;
                 dokoaPlayer.current.pause();
                 interfaceVisible();
-                document.getElementById("playBtn").setAttribute("d", svg.play);
+                playBtn.current.setAttribute("d", svg.play);
             } else {
                 window.isPlayed = true;
                 dokoaPlayer.current.play();
                 interfaceVisible();
-                document.getElementById("playBtn").setAttribute("d", svg.pause);
+                playBtn.current.setAttribute("d", svg.pause);
             }
         }
     };
@@ -334,25 +333,48 @@ const PlayerModule = () => {
     };
 
     let [windowStatus, setWindowStatus] = useState({
-        active: " ",
     });
 
-    const backToMainWindowButton = (option) => {
-        let windowNow = document.getElementsByClassName(windowStatus.active)[0];
+    var windowNow
+    const backToMainWindowButton = () => {
+        switch(windowStatus.active){
+            case"settingsSpeedWindow":
+            windowNow = settingsSpeedWindow;
+            break;
+            case"settingsCaptionWindow":
+            windowNow = settingsCaptionWindow;
+            break;
+            case"settingsQualityWindow":
+            windowNow = settingsQualityWindow;
+            break;
+        }
+        console.log(windowNow)
         settingsMainWndow.current.style.display = "contents";
-        windowNow.style.display = "none";
+        windowNow.current.style.display = "none";
         backToMainWindow.current.style.display = "none";
     };
 
     const settingsOptionChange = (option) => {
-        let windowNow = document.getElementsByClassName(option)[0];
+        
+        switch(option){
+            case"settingsSpeedWindow":
+            windowNow = settingsSpeedWindow;
+            break;
+            case"settingsCaptionWindow":
+            windowNow = settingsCaptionWindow;
+            break;
+            case"settingsQualityWindow":
+            windowNow = settingsQualityWindow;
+            break;
+        }
+        console.log(windowNow)
         setWindowStatus({
             last: windowStatus.active,
             active: option,
         });
 
         settingsMainWndow.current.style.display = "none";
-        windowNow.style.display = "contents";
+        windowNow.current.style.display = "contents";
         backToMainWindow.current.style.display = "flex";
     };
 
@@ -461,13 +483,13 @@ const PlayerModule = () => {
 
         // technical functions
 
+        
+
         function fullscreenSVG() {
             if (document.fullscreenElement) {
-                document.getElementById("fullscreenBtn").setAttribute("d", svg.extend);
+                fullscreenBtn.current.setAttribute("d", svg.extend);
             } else {
-                document
-                    .getElementById("fullscreenBtn")
-                    .setAttribute("d", svg.fullscreen);
+                fullscreenBtn.current.setAttribute("d", svg.fullscreen);
             }
         }
 
@@ -570,7 +592,6 @@ const PlayerModule = () => {
                             >
                                 <div className="settignsIco">
                                     <svg
-                                        fill="#000000"
                                         width="40px"
                                         height="38px"
                                         viewBox="0 0 32 32"
@@ -605,7 +626,7 @@ const PlayerModule = () => {
                             </button>
                         </div>
 
-                        <div className="settingsQualityWindow">
+                        <div ref={settingsQualityWindow} className="settingsQualityWindow">
                             <SettingsQualitySwitch links={links} />
                         </div>
 
@@ -613,7 +634,7 @@ const PlayerModule = () => {
                             <SettingsSpeedSwitch />
                         </div>
 
-                        <div className="settingsCaptionWindow"></div>
+                        <div ref={settingsCaptionWindow} className="settingsCaptionWindow"></div>
                     </div>
                 </div>
                 <div className="timeLineContainer">
@@ -639,7 +660,7 @@ const PlayerModule = () => {
                         <div className="PlayButton">
                             <button onClick={Play} className="Play-btn">
                                 <svg viewBox="0 0 50 50">
-                                    <path id="playBtn" d={svg.play} />
+                                    <path ref={playBtn} id="playBtn" d={svg.play} />
                                 </svg>
                             </button>
                         </div>
@@ -678,7 +699,7 @@ const PlayerModule = () => {
                         <div className="fullScreenContainer">
                             <button className="fullScreen" onClick={fullScreen}>
                                 <svg viewBox="0 0 170 170">
-                                    <path id="fullscreenBtn" d={svg.fullscreen} />
+                                    <path ref={fullscreenBtn} id="fullscreenBtn" d={svg.fullscreen} />
                                 </svg>
                             </button>
                         </div>
